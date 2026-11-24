@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wa-backup-cache-v7';
+const CACHE_NAME = 'wa-backup-cache-v11';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -27,6 +27,12 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  
+  // Never cache encrypted books (.enc) so fresh files always load from server
+  if (e.request.url.includes('.enc')) {
+    e.respondWith(fetch(e.request, { cache: 'no-store' }));
+    return;
+  }
   
   // Network-First for HTML pages so changes update immediately
   if (e.request.mode === 'navigate' || e.request.headers.get('accept')?.includes('text/html')) {
